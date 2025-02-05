@@ -1,0 +1,154 @@
+import java.util.*;
+class driver{
+    String drivername;
+    String phoneno;
+    String driverid;
+    boolean ride=false;
+    Scanner sc=new Scanner(System.in);
+    public void profile(){
+        System.out.println("Enter the name of the driver");
+        String name=sc.next();
+        drivername=name;
+        System.out.println("Enter the phoneno of the driver");
+        String phoneno=sc.next();
+        this.phoneno=phoneno;
+        System.out.println("Enter the driverid of the driver");
+        String userid=sc.next();
+        this.driverid=userid;
+    }
+    public void display(){
+        System.out.println("driver id :"+driverid);
+        System.out.println("driver name :"+drivername);
+        System.out.println("phone no :"+phoneno);
+        System.out.println("ride can be taken"+ride);
+    }
+}
+class user{
+    String username;
+    String phoneno;
+    String userid;
+    Scanner sc=new Scanner(System.in);
+    public void profile(){
+        System.out.println("Enter the name of the user");
+        String name=sc.next();
+        username=name;
+        System.out.println("Enter the phoneno of the user");
+        String phoneno=sc.next();
+        this.phoneno=phoneno;
+        System.out.println("Enter the userid of the user");
+        String userid=sc.next();
+        this.userid=userid;
+    }
+    public void display(){
+        System.out.println("User id :"+userid);
+        System.out.println("User name :"+username);
+        System.out.println("phone no :"+phoneno);
+    }
+    
+}
+class Main{
+    public static void main(String args[]){
+        Scanner sc=new Scanner(System.in);
+        System.out.println("Enter the number of user");
+        int user_no=sc.nextInt();
+        user[] u=new user[user_no];
+        for(int i=0;i<user_no;i++){
+            u[i]=new user(); // u refer to user
+            u[i].profile();
+        }
+        System.out.println("Enter the number of driver");
+        int driver_no=sc.nextInt();
+        driver[] d=new driver[driver_no];
+        for(int i=0;i<driver_no;i++){
+            d[i]=new driver();
+            d[i].profile();
+        }
+        
+        boolean t=true;
+        while(t){
+            
+        System.out.println("---------Enter your choice---------");
+        System.out.println("---------1-View user details:------");
+        System.out.println("---------2-View driver details:----");
+        System.out.println("---------3-book a cab--------------");
+        System.out.println("---------4-driver login------------");
+        System.out.println("---------5 to exit------------");
+        int choice=sc.nextInt();
+        switch(choice){
+            case 1:
+                System.out.println("User details:");
+                for(int i=0;i<user_no;i++){
+                    System.out.println("User -->"+i+1);
+                    u[i].display();
+                }
+                break;
+            case 2:
+                System.out.println("Driver details:");
+                for(int j=0;j<driver_no;j++){
+                    System.out.println("Driver-->"+j+1);
+                    d[j].display();
+                }
+                break;
+            case 3:
+                System.out.println("Enter your user id to book:");
+                String bookid=sc.next();
+                for(int i=0;i<user_no;i++){
+                    if(u[i].userid.equals(bookid)){
+                        sc.nextLine();
+                        u[i].display();
+                        System.out.println("Enter your location:");
+                        String loc=sc.nextLine();
+                        System.out.println("Enter your destination:");
+                        String end=sc.nextLine();
+                        boolean k=true;
+                        for(int j=0;j<driver_no;j++){
+                            if(d[j].ride==false){
+                                d[j].ride=true;
+                                d[j].display();
+                                k=false;
+                                break;
+                            }
+                        }
+                        if(k==true){
+                            System.out.println("the driver all are busy");
+                        }else{
+                        System.out.println("Succesfully you have booked your driver details is above");}
+                        System.out.println("Enjoy your ride safely");
+                    }
+                }
+                break;
+            
+              case 4:
+                  for(int i=0;i<driver_no;i++){
+                      d[i].display();
+                  }
+                  System.out.println("Enter the driver id to get new customer:");
+                  String drid=sc.next();
+                  boolean tn=true;
+                  for(int i=0;i<driver_no;i++){
+                      if(drid.equals(d[i].driverid));
+                      {
+                          d[i].ride=false;
+                          tn=false;
+                         break;
+                      }
+                  }
+                  if(tn==false){
+                      System.out.println("Sussesfully done");
+                  }
+                  else{
+                      System.out.println("not found");
+                  }
+                  break;
+                  
+            case 5:
+                t=false;
+                break;
+            default:
+               break;
+        }
+            
+        }
+        System.out.println("thanks for booking");
+    }
+}
