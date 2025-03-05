@@ -1,0 +1,124 @@
+import java.util.*;
+
+public class Main
+{
+public static void main(String[] args) {
+sn s=new sn(6,6);
+s.start();
+}
+}
+class sn{
+    static Scanner sc=new Scanner(System.in);
+    private Queue<node> body=new LinkedList<>();
+    private Queue<node> food=new LinkedList<>();
+    private char[][] box=null;
+    static int row2=0,col2=0;
+   
+    sn(int row,int col){
+        box=new char[row][col];
+        body.add(new node(0,0));
+        box[row2][col2]='-';
+        food.add(new node(0,2));
+        
+        food.add(new node(1,3));
+        
+        food.add(new node(3,0));
+        
+        food.add(new node(1,5));
+        
+        food.add(new node(5,5));
+        food.add(new node(0,0));
+        food.add(new node(5,4));
+        food.add(new node(2,5));
+
+        allocatefood();
+        
+    }
+    public void start(){
+        display();
+        System.out.println("enter the direct U | D | R | L |:");
+        char c=sc.next().toUpperCase().charAt(0);
+        switch(c){
+            case 'U':
+                makemove(--row2,col2);
+            case 'D':
+                makemove(++row2,col2);
+               
+            case 'R':
+                makemove(row2,++col2);
+            case 'L':
+                makemove(row2,--col2);
+        }
+    }
+   
+    public void makemove(int row1,int col1){
+        if((row1>=0 && row1<box.length)&&(col1>=0 && col1<box.length) ){
+          if(box[row1][col1]=='-'){
+            System.out.println("Invalid move");
+            System.exit(0);  
+          }
+          
+          if(box[row1][col1]!='X'){
+               node n=body.poll();
+               int r=n.row;
+               int c=n.clom;
+               box[r][c]='?';
+               box[row1][col1]='-';
+              
+          }
+          if(box[row1][col1]=='X'){
+               box[row1][col1]='-';
+               allocatefood();
+          }
+               body.add(new node(row1,col1));
+               start();
+               
+             
+        }else{
+            System.out.println("Invalid move");
+            System.exit(0);  
+        }
+    }
+   
+    public void display(){
+       for(int i=0;i<box.length;i++){
+           for(int j=0;j<box.length;j++){
+               if(box[i][j] == '\0'){
+               System.out.print("? ");
+               }else{
+                System.out.print(box[i][j]+" ");
+               }
+           }
+           System.out.println();
+    }
+       
+    }
+    public void allocatefood(){
+        node f=food.poll();
+        int r=f.row;
+        int c=f.clom;
+        
+        box[r][c]='X';
+        if(food.isEmpty()){
+            box[r][c]='?';
+              System.out.println("Succesfully completed");
+              System.exit(0);
+          }
+    }
+   
+}
+class node{
+    int row;
+    int clom;
+    node(int row,int clom){
+        this.row=row;
+        this.clom=clom;
+    }
+    public int getrow(){
+        return row;
+       
+    }
+    public int getcol(){
+        return clom;
+    }
+}
