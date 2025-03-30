@@ -1,0 +1,335 @@
+import java.util.*;
+class login{
+    String username;
+    String password;
+    login(String username, String password){
+        this.username = username;
+        this.password = password;
+    }
+    public String toString(){
+        return "Username:"+ username + "\tPassword:" + password;
+    }
+}
+class item{
+    int itemno;
+    String itemname;
+    int Qty;
+    float price;
+    item(int itemno,String itemname,int Qty,float price){
+        this.itemno=itemno;
+        this.itemname=itemname;
+        this.Qty=Qty;
+        this.price=price;
+    }
+    public String toString(){
+        return "Item_No:"+itemno+"\tItem_name:"+itemname+"\tItem_Qty:"+Qty+"\tPrice:"+price;
+    }
+}
+
+class bill{
+    int itemno;
+    String itemname;
+    int Qty;
+    float price;
+    bill(int itemno,String itemname,int Qty,float price){
+        this.itemno=itemno;
+        this.itemname=itemname;
+        this.Qty=Qty;
+        this.price=price;
+    }
+    public String toString(){
+        return "Item_No:"+itemno+"\tItem_name:"+itemname+"\tItem_Qty:"+Qty+"\tPrice:"+price;
+    }
+}
+public class Main
+{
+    static Scanner sc = new Scanner(System.in);   
+    static shoping shop = new shoping();
+    static int Customercount = 0;
+    static int sellercount = 0;
+    static int itemno=0;
+    static int billid=1;
+	public static void main(String[] args) {
+	    while(true){
+	        System.out.println("1-to register:");
+	        System.out.println("2-to login:");
+	        System.out.println("3-to exit:");
+	        int choice = sc.nextInt();
+	        switch(choice){
+	            case 1:
+	                register();
+	                break;
+	            case 2:
+	                login();
+	                break;
+	            case 3:
+	                return;
+	            case 15:
+	                shop.display(Customercount,sellercount);
+	            
+	        }
+	    }
+		
+	}
+	
+	public static void login(){
+	    System.out.println("Choice the number :");
+	    System.out.println("1-Buyer:");
+	    System.out.println("2-Seller:");
+	    int Choice = sc.nextInt();
+	    if(Choice==1){
+	        ArrayList<bill> bill1=new ArrayList<>();
+	        System.out.println("Enetr the Username:");
+	        String username =sc.next();
+	        System.out.println("Enetr the Password:");
+	        String password=sc.next();
+	        if(shop.valid_customer(username,password,Customercount)){
+	            System.out.println("Welcome:-->"+username);
+	            while(true){
+	                shop.displayitem(itemno);
+	                System.out.println("Enter 100 to exit or 1 to additem:");
+	                int choiceitem=sc.nextInt();
+	                if(choiceitem==100){
+	                    break;
+	                }
+	                if(choiceitem ==1){
+	                System.out.println("Enter the your id to add:");
+	                int id=sc.nextInt();
+	                System.out.println("Enter the Qyt to add:");
+	                int qty=sc.nextInt();
+	                bill b=shop.add(id,qty);
+	                bill1.add(b);
+	                }
+	            }
+	            int sum=0;
+	            System.out.println("-------BILL-------");
+	            for(bill i:bill1){
+	                System.out.println(i);
+	                sum+=i.price;
+	            }
+	            shop.addbill(billid,username,sum);
+	            billid++;
+	            System.out.println("Total amount:"+sum);
+	            System.out.println("Enter (Yes) to checkout");
+	            String yes=sc.next();
+	            if(yes.equals("Yes")){
+	                System.out.println("Succefully checkout:");
+	            }else{
+	                login();
+	            }
+	        }else{
+	            System.out.println("--Enetr the correct user name and password--");
+	            login();
+	        }
+	    }else if(Choice==2){
+	        System.out.println("Enetr the Username:");
+	        String username = sc.next();
+	        System.out.println("Enetr the Password:");
+	        String password= sc.next();
+	        if(shop.valid_seller(username,password,sellercount)){
+	        System.out.println("Enter the choice to");
+	        System.out.println("1-ADD_ITEM:");
+	        System.out.println("2-Update_Item:");
+	        System.out.println("3-data of shop:");
+	        int choicei = sc.nextInt();
+	        if(choicei == 1){
+	        System.out.println("item number"+itemno);
+	        System.out.println("Item name:");
+	        String itemname = sc.next();
+	        System.out.println("Item Qty:");
+	        int Qty = sc.nextInt();
+	        System.out.println("Enter the price:");
+	        float price = sc.nextFloat();
+	        shop.additem(itemno,itemname,Qty,price);
+	        System.out.println("Succefully add item");
+	        itemno++;
+	        }
+	        else if(choicei == 2){
+	            shop.displayitem(itemno);
+	            System.out.println("Update item by the item number:");
+	            System.out.println("Enter the item no:");
+	            int itno = sc.nextInt();
+	            System.out.println("Item name:");
+	             String itemname = sc.next();
+	             System.out.println("Item Qty:");
+	             int Qty = sc.nextInt();
+	             System.out.println("Enter the price:");
+	             float price = sc.nextFloat();
+	            shop.update(itno,itemname,Qty,price);
+	        }else if(choicei == 3){
+	            System.out.println("Bill for the shop:");
+	            shop.displaybill1();
+	        }
+	        else{
+	            System.out.println("Enter the correct number");
+	            login();
+	        }
+	        }else{
+	            login();
+	        }
+	    }
+	    else{
+	        System.out.println("Enter the correct number");
+	        login();
+	    }
+	}
+	public static void register(){
+	    
+	    System.out.println("Choice the number :");
+	    System.out.println("1-for the Customer:");
+	    System.out.println("2-for the seller:");
+	    
+	    int choice=sc.nextInt();
+	    if(choice==1){
+	        System.out.println("The customer id is: "+(Customercount+1));
+	        System.out.println("Enter your user name:");
+	        String username = sc.next();
+	        System.out.println("Enter the password:");
+	        String password = sc.next();
+	        boolean succe=shop.customer_reg(username,password,Customercount);
+	        if(succe){
+	            System.out.println("Successfully registed");
+	            Customercount++;
+	        }else{
+	            System.out.println("failed to register");
+	        }
+	    }else if(choice == 2){
+	        System.out.println("The seller id is: "+(sellercount+1));
+	        System.out.println("Enter your user name:");
+	        String username = sc.next();
+	        System.out.println("Enter the password:");
+	        String password = sc.next();
+	        boolean succe=shop.seller_reg(username,password,sellercount);
+	        if(succe){
+	            System.out.println("Successfully registed");
+	            sellercount++;
+	        }else{
+	            System.out.println("failed to register");
+	        }
+	    }else{
+	        System.err.println("<--Enter the correct number-->");
+	        register();
+	    }
+	}
+}
+class shoping{
+    private login[] customer = new login[100];
+    private login[] seller = new login[100];
+    item[] aditem=new item[100];
+    ArrayList<billdata> bill=new ArrayList<>();
+    public boolean customer_reg(String username,String password,int index){
+        login l=new login(username,password);        
+        try
+        {
+        customer[index] = l;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+        return true;
+    }
+    public boolean seller_reg(String username,String password,int index){
+        login l=new login(username,password);
+        try
+        {
+        seller[index] = l;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+        return true;
+    }
+    public void display(int Customercount,int sellercount){
+        System.out.println("customer_data:");
+        System.out.println("--------------");
+        for(int i = 0;i < Customercount; i++){
+            System.out.println(customer[i]);
+        }
+        System.out.println("Seller_data:");
+        System.out.println("-------------");
+
+        for(int i = 0; i < sellercount; i++){
+            System.out.println(seller[i]);
+        }
+    }
+    
+    public boolean valid_customer(String username,String password,int Customercount){
+                for(int i=0;i<Customercount;i++){
+                    if(customer[i].username.equals(username) && customer[i].password.equals(password)){
+                        return true;
+                    }
+                }
+                return false;
+        
+    }
+    public boolean valid_seller(String username,String password,int sellercount){
+                for(int i=0;i<sellercount;i++){
+                    if(seller[i].username.equals(username) && seller[i].password.equals(password)){
+                        return true;
+                    }
+                }
+                return false;
+        
+    }
+    
+    public void additem(int itemno,String itemname,int Qty,float price){
+        item newitem=new item(itemno,itemname,Qty,price);
+        aditem[itemno]=newitem;
+    }
+    public void displayitem(int itemno){
+        for(int i = 0; i < itemno; i++){
+            System.out.println(aditem[i]);
+        }
+    }
+    public void update(int itemno,String itemname,int Qty,float price){
+        try{
+        aditem[itemno].itemname=itemname;
+        aditem[itemno].Qty=Qty;
+        aditem[itemno].price=price;
+        System.out.println("Successfully_updated");
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+        
+    }
+    public bill add(int item,int qty){
+        String itemname=aditem[item].itemname;
+        aditem[item].Qty-=qty;
+        float price=aditem[item].price*qty;
+        return new bill(item,itemname,qty,price);
+        
+    }
+    
+    public void addbill(int billid,String name,float price){
+        billdata b=new billdata(billid,name,price);
+        bill.add(b);
+    }
+    public void displaybill1(){
+        float sum=0;
+        bill.sort((p1,p2)->Float.compare(p2.price,p1.price));
+        for(billdata i:bill){
+            System.out.println(i);
+            sum+=i.price;
+        }
+        System.out.println("Total amount of the shop:"+sum);
+    }
+}
+
+
+class billdata{
+    int billid;
+    String name;
+    float price;
+    billdata(int billid,String name,float price){
+        this.billid=billid;
+        this.name=name;
+        this.price=price;
+    }
+    
+    public String toString(){
+        return "Bill_Id:"+billid+"\tName:"+name+"\tPrice:"+price;
+    }
+}
