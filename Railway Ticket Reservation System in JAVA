@@ -1,0 +1,238 @@
+import java.util.*;
+class passanger{
+    int passangerid;
+    String passangername;
+    int passangerage;
+    String pgender;
+    String breathprefrence;
+    passanger(int passangerid,String passangername,int passangerage,String pgender,String breathprefrence){
+        this.passangerid = passangerid;
+        this.passangername = passangername;
+        this.passangerage = passangerage;
+        this.pgender = pgender;
+        this.breathprefrence = breathprefrence;
+        
+    }
+    public String toString(){
+        return String.format("\n%-15d %-15s %-15d %-15s %-15s",passangerid,passangername,passangerage,pgender,breathprefrence);
+    }
+}
+class train{
+        ArrayList<String> seat = new ArrayList<>(Arrays.asList("L","M","U"));
+        Queue<passanger> Rac = new LinkedList<>();
+        Queue<passanger> waithing = new  LinkedList<>();
+        ArrayList<passanger> conformed = new ArrayList<>();
+        static int rac_count = 1;
+        private static int waithing_lis = 1;
+        public boolean Avialbleseat(int passangerid,String passangername, int age,String gender,String seatp){
+            if(((age>=50 && gender.equals("female"))||(age >= 60 && gender.equals("male")))&&(!seat.isEmpty()) && (seat.indexOf("L")>=0)){
+                seat.remove(seat.indexOf("L"));
+                conformed.add(new passanger(passangerid,passangername,age,gender,"L"));
+                return true;
+
+            }
+            else if((!seat.isEmpty())&&(seat.indexOf(seatp) >=0)){
+                seat.remove(seat.indexOf(seatp));
+                conformed.add(new passanger(passangerid,passangername,age,gender,seatp));
+                return true;
+
+            }
+            else if((!seat.isEmpty())){
+                conformed.add(new passanger(passangerid,passangername,age,gender,seat.get(0)));
+                seat.remove(0);
+                return true;
+
+            }
+            
+            else if((rac_count != 0)&&(seat.isEmpty())){
+                
+                Rac.add(new passanger(passangerid,passangername,age,gender,"Rac"));
+                rac_count -= 1;
+                return true;
+                
+            }
+            else if((rac_count==0)&&(waithing_lis!=0)){
+                waithing.add(new passanger(passangerid,passangername,age,gender,"waithing_list"));
+                waithing_lis -= 1;
+                return true;
+            }
+            return false;
+            
+        }
+        
+        public void displayconformed(){
+            if(!conformed.isEmpty()){
+            System.out.println("------conformed ticket--------");
+            System.out.printf("%-15s %-15s %-15s %-15s %-15s","Passangerid:","Passangername:","Passangerage:","Pgender:","Seat");
+            for(passanger p:conformed){
+                System.out.println(p);
+            }
+            }
+            
+        }
+        public void displayrac(){
+            if(!Rac.isEmpty()){
+            System.out.println("--------------------------------------------------------------------------------------------");
+            System.out.println("------RAC ticket--------");
+            System.out.printf("%-15s %-15s %-15s %-15s %-15s","Passangerid:","Passangername:","Passangerage:","Pgender:","Seat");
+            for(passanger p:Rac){
+                System.out.println(p);
+            }
+            }
+        }
+        
+        public void displaywaiting(){
+            if(!waithing.isEmpty()){
+            System.out.println("--------------------------------------------------------------------------------------------");
+            
+            System.out.println("------waiting list ticket--------");
+            System.out.printf("%-15s %-15s %-15s %-15s %-15s","Passangerid:","Passangername:","Passangerage:","Pgender:","Seat");
+            for(passanger p:waithing){
+                System.out.println(p);
+            }
+            }
+        }
+        
+        public boolean cancelticket(int id){
+            System.out.println("succesfully");
+            for(passanger p:conformed){
+                if(p.passangerid == id)
+                {
+                    int index = conformed.indexOf(p);
+                    if(!Rac.isEmpty())
+                    {
+                        passanger p1 = Rac.poll();
+                        p1.breathprefrence = p.breathprefrence;
+                        conformed.set(index,p1);
+                        
+                            if(!waithing.isEmpty())
+                            {
+                                passanger p2 = waithing.poll();
+                                p2.breathprefrence = "Rac";
+                                Rac.add(p2);
+                                waithing_lis+=1;
+                                if(waithing.isEmpty()){
+                                    waithing_lis=1;
+                                }
+                            }else{
+                                System.out.println("hi");
+                                rac_count+=1;
+                                waithing_lis=1;
+                            }
+                            
+                            if(Rac.isEmpty()){
+                            rac_count=1;
+                        }
+                    }
+                        else{
+                          rac_count = 1;
+                          conformed.remove(index);
+                          seat.add(p.breathprefrence);
+
+                        }
+                    return true;
+                }
+            }
+            return false;
+            
+            
+        }
+	
+    }
+public class Main
+{
+    static int passangerid=1;
+    static Scanner sc = new Scanner(System.in);
+    static train train = new train();  
+	public static void main(String[] args) 
+	{
+	    while(true){
+	    System.out.println("Welcome to maduri to chennai train:");
+	    System.out.println("!!Avialble set in train: "+ (train.seat.size() > 0 ?train.seat.size():train.rac_count)+"-->booing are going fast ");
+	    System.out.println("1 --------book ticket:-------------");
+	    if(!train.conformed.isEmpty()){
+	    System.out.println("2 -------view ticket booked:--------");
+	    }
+	    if(!train.conformed.isEmpty()){
+	    System.out.println("3--------Cancel the ticket:--------");
+	    }
+	    System.out.println("4---------------exit---------------");
+		System.out.println("Enter your choice:");
+		int choice=sc.nextInt();
+		switch(choice){
+		    case 1:
+		        bookticket();
+		        break;
+		    case 2:
+		        train.displayconformed();
+		        train.displayrac();
+		        train.displaywaiting();
+		        break;
+		   case 3:
+		       cancelticket();
+		       break;
+		  case 4:
+		      return ;
+		      
+		}
+		
+	    }
+	    
+	}
+	public static void bookticket(){
+	    System.out.println("Passangerid is:"+passangerid);
+	    System.out.println("Enter your name:");
+	    String name= sc.next();
+	    System.out.println("Enter your age :");
+	    int age = sc.nextInt();
+	    System.out.println("Enter your Gender:");
+	    String gender= sc.next().toLowerCase();
+	    System.out.println("Enter your seat prefrence:");
+	    String seat = sc.next().toUpperCase();
+	    if(train.Avialbleseat(passangerid,name,age,gender,seat))
+	    {
+	        System.out.println("the ticket is succesfully booked");
+	        passangerid++;
+	    }else{
+	        System.out.println("No Avialbleseat");
+	    }
+	}
+	public static void cancelticket(){
+	    train.displayconformed();
+	    System.out.println("Enetr the passangerid:");
+	    int id=sc.nextInt();
+	    int c = random();
+	    System.out.println("Enter the captcha code% "+c+"%");
+	    int captcha=sc.nextInt();
+	    if(c==captcha){
+	        if(train.cancelticket(id)){
+	            System.out.println("succesfully cancled");
+	        }else{
+	            System.out.println("Not canceld");
+	        }
+	    }
+	    else{
+	        System.out.println("enter the captcha properly");
+	        cancelticket();
+	    }
+	}
+	public static int random(){
+	    int c = (int)(Math.random()*101);
+	    return c;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
