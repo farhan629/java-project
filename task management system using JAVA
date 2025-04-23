@@ -1,0 +1,68 @@
+import java.util.*;
+class Task{
+    int taskid;
+    String taskname;
+    String taskdescription;
+    Task(int taskid,String taskname,String taskdescription){
+        this.taskid = taskid;
+        this.taskname = taskname;
+        this.taskdescription = taskdescription;
+    }
+    public String toString(){
+        return String.format("%-15d %-15s %-15s",taskid,taskname,taskdescription);
+    }
+}
+public class Main
+{
+    static int taskid = 1;
+    static Scanner sc = new Scanner(System.in);
+    static taskmanagement taskmanagement = new taskmanagement();
+	public static void main(String[] args) {
+	    while(true){
+	        System.out.println("Entre the your choice:");
+	        System.out.println("1-Enter your task");
+	        System.out.println("2-disply your task");
+	        System.out.println("3-Exit");
+	        int choice = sc.nextInt();
+	       sc.nextLine(); // consume the leftover newline
+	        switch(choice){
+	            case 1:
+	                addtask();
+	                break;
+	            case 2:
+	                taskmanagement.display();
+	                break;
+	            case 3:
+	                return;
+	                
+	        }
+	    }
+		
+	}
+	public static void addtask(){
+	    System.out.println("task id:"+taskid);
+	    System.out.println("Entre your task :");
+	    String tas = sc.nextLine();
+	    System.out.println("Entre your task description:");
+	    String taskdes= sc.nextLine();
+	    Task t = new Task(taskid,tas,taskdes);
+	    taskmanagement.addtask(t);
+	    taskid++;
+	}
+}
+class taskmanagement{
+    Task taskdata[] = new Task[100];
+    static int taskdataid = 0;
+    public void addtask(Task t){
+        taskdata[taskdataid] = t;
+        taskdataid++;
+    }
+    public void display(){
+        System.out.printf("%-15s %-15s %-15s","taskid","taskname","taskdescription");
+        System.out.println();
+        for(int i = 0; i < taskdataid;i++){
+            System.out.println(taskdata[i]);
+        }
+        System.out.println("------------------------------------------------------");
+    }
+}
