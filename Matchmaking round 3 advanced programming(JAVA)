@@ -1,0 +1,110 @@
+import java.util.*;
+
+class Person{
+    String name;
+    String gender;
+    String father;
+    String mother;
+    Person(String name,String gender,String father,String mother){
+        this.name = name;
+        this.gender = gender;
+        this.father = father;
+        this.mother = mother;
+    }
+    public String toString(){
+        return name+" "+gender+" "+father+" "+mother;
+    }
+    
+}
+public class Main
+{
+    
+	public static void main(String[] args) {
+	    
+	    HashMap<String,Person> familyTree = new HashMap<>();
+	    
+	    addPerson(familyTree, "John", "Male", "Brad", "Lisa");
+        addPerson(familyTree, "Emma", "Female", "Brad", "Lisa");
+        addPerson(familyTree, "Alex", "Male", "John", "Jenny");
+        addPerson(familyTree, "Emily", "Female", "Steve", "Emma");
+        addPerson(familyTree, "Rachel", "Female", "Steve", "Emma");
+        
+        ArrayList<String> result = findthematch(familyTree,"Emily");
+        System.out.println("The match is :"+ result);
+        
+	}
+	
+	public  static void addPerson(HashMap<String,Person> familyTree,String name,String gender,String father,String mother){
+	    familyTree.put(name,new Person(name,gender,father,mother));
+	}
+	public static ArrayList findthematch(HashMap<String,Person> familyTree,String personname){
+	    ArrayList<String> matches = new ArrayList<>();
+	    if(!familyTree.containsKey(personname)){
+	        matches.add("No matches found");
+	        matches.add("matches did not found!!!");
+	        return matches;
+	    }
+	    if(familyTree.get(personname).gender.equals("Male")){
+	        String father = familyTree.get(personname).father;
+	        if(familyTree.containsKey(father)){
+	            String grandfather = familyTree.get(father).father;
+	            for(Person p : familyTree.values()){
+	                if(p.father != null && p.father.equals(grandfather) && p.gender.equals("Female")){
+	                    for(Person child : familyTree.values()){
+	                        if(child.mother!=null && child.mother.equals(p.name) && !child.father.equals(father) && child.gender.equals("Female")){
+	                            matches.add(child.name);
+	                        }
+	                    }
+	                }
+	            }
+	            
+	        }
+	        String mother = familyTree.get(personname).mother;
+	        if(familyTree.containsKey(mother)){
+	            String grandfather = familyTree.get(mother).father;
+	            for(Person p : familyTree.values()){
+	                if(p.father != null && p.father.equals(grandfather) && p.gender.equals("Male")){
+	                    for(Person child : familyTree.values()){
+	                        if(child.mother!=null && child.father.equals(p.name) && !child.mother.equals(mother) && child.gender.equals("Female")){
+	                            matches.add(child.name);
+	                        }
+	                    }
+	                }
+	            }
+	            
+	        }
+
+	    }else{
+	       String father = familyTree.get(personname).father;
+	        if(familyTree.containsKey(father)){
+	            String grandfather = familyTree.get(father).father;
+	            for(Person p : familyTree.values()){
+	                if(p.father != null && p.father.equals(grandfather) && p.gender.equals("Female")){
+	                    for(Person child : familyTree.values()){
+	                        if(child.mother != null && child.mother.equals(p.name) && !child.father.equals(father) && child.gender.equals("Male")){
+	                            matches.add(child.name);
+	                        }
+	                    }
+	                }
+	            }
+	            
+	        } 
+	        
+	        String mother = familyTree.get(personname).mother;
+	        if(familyTree.containsKey(mother)){
+	            String grandfather = familyTree.get(mother).father;
+	            for(Person p : familyTree.values()){
+	                if(p.father != null && p.father.equals(grandfather) && p.gender.equals("Male")){
+	                    for(Person child : familyTree.values()){
+	                        if(child.mother!=null && child.father.equals(p.name) && !child.mother.equals(mother) && child.gender.equals("Male")){
+	                            matches.add(child.name);
+	                        }
+	                    }
+	                }
+	            }
+	            
+	        }
+	    }
+	    return matches;
+	}
+}
