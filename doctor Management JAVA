@@ -1,0 +1,93 @@
+import java.time.format.*;
+import java.time.*;
+import java.util.*;
+class Patient{
+    int Patientid;
+    String Patientname;
+    LocalTime arrival;
+    LocalTime end;
+    Patient(int Patientid,String Patientname,LocalTime arrival,LocalTime end){
+        this.Patientid = Patientid;
+        this.Patientname = Patientname;
+        this.arrival = arrival;
+        this.end = end;
+    }
+    public String toString(){
+        return String.format("%5d %10s %10s %10s",Patientid,Patientname,arrival.toString(),end.toString());
+    }
+}
+class hospinfo{
+    ArrayList<Patient> information = new ArrayList<>();
+    Queue<Patient> que = new LinkedList<>();
+    
+    static final int RECEPTION_TIME = 5; 
+    static final int MEDICAL1_TIME = 10;
+    static final int MEDICAL2_TIME = 10;
+    LocalTime last = null;
+    
+    public void insert(int Patientid,String Patientname,String date){
+        Patient pop;
+        if(!que.isEmpty()){
+            pop = que.poll();
+            last = pop.end;
+        } 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        LocalTime arrival = LocalTime.parse(date, formatter);
+        LocalTime start = (last == null || arrival.isAfter(last)) ? arrival : last;
+
+        int docter = new Random().nextInt(15)+5;
+        int add = RECEPTION_TIME +  MEDICAL1_TIME + MEDICAL2_TIME +docter;
+        LocalTime end = start.plusMinutes(add);
+        que.add(new Patient(Patientid,Patientname,arrival,end));
+        information.add(new Patient(Patientid,Patientname,arrival,end));
+        System.out.println(new Patient(Patientid,Patientname,arrival,end));
+        System.out.println("Succefully inserted");
+        
+    } 
+    public void display(){
+            System.out.printf("%5s %10s %10s %10s\n", "ID", "Name", "Arrival", "End Time");
+
+        for(Patient p:information){
+            System.out.println(p);
+        }
+    }
+    
+}
+public class Main
+{
+    static Scanner sc = new Scanner(System.in);
+    static int Patientids = 0;
+    static hospinfo info = new hospinfo(); 
+	public static void main(String[] args) {
+	  while(true){
+	       System.out.println("Enter your choice:");
+	       System.out.println("2-display:");
+	       System.out.println("1-insert:");
+	       System.out.println("3-exit:");
+	       int choice=sc.nextInt();
+	       switch(choice){
+	           case 1:
+	               insert();
+	               break;
+	           case 2:
+	               info.display();
+	               break;
+	           case 3:
+	               return ;
+	           default:
+	            break;
+	       }
+	  }
+	}
+	  public static void insert(){
+	      Patientids++;
+	      int Patientid= Patientids;
+	      System.out.println("Eneter your name:");
+	      String name = sc.next();
+	      System.out.println("Enter your arrival time(HH:MM):");
+	      String date = sc.next();
+	      info.insert(Patientid,name,date);
+	  }
+		
+	
+}
