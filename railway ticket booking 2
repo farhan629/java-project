@@ -1,0 +1,232 @@
+import java.util.*;
+
+class RailwayStation {
+    char railway_id;
+    ArrayList<Integer> bookinginfo;
+
+    RailwayStation(char railway_id) {
+        this.railway_id = railway_id;
+        bookinginfo = new ArrayList<>();
+        for (int i = 1; i <= 8; i++) {
+            bookinginfo.add(i);
+        }
+    }
+}
+
+class WaitingList {
+    int waitingId;
+    ArrayList<Integer> wl;
+
+    WaitingList(int waitingId) {
+        this.waitingId = waitingId;
+        wl = new ArrayList<>();
+        for (int i = 1; i <= 2; i++) {
+            wl.add(i);
+        }
+    }
+}
+
+class Ticket {
+    int ticket_id;
+    char start;
+    char destination;
+    String ticketType;
+    int ticketQty;
+    ArrayList<Integer> seatNo;
+
+    Ticket(int ticket_id, char start, char destination, String ticketType, int ticketQty) {
+        this.ticket_id = ticket_id;
+        this.start = start;
+        this.destination = destination;
+        this.ticketType = ticketType;
+        this.ticketQty = ticketQty;
+        seatNo = new ArrayList<>();
+    }
+}
+
+class Booking {
+    ArrayList<RailwayStation> railwayList = new ArrayList<>();
+    ArrayList<Ticket> tickets = new ArrayList<>();
+    WaitingList waiting = new WaitingList(1);
+    final static int confirmedTicket = 8;
+    final static int waitingTicket = 2;
+
+    Booking() {
+        // Add 5 stations: A, B, C, D, E
+        for (char ch = 'A'; ch <= 'E'; ch++) {
+            railwayList.add(new RailwayStation(ch));
+        }
+    }
+
+    public boolean isAvailable(char start, char destination, int qty) {
+        int s = start - 'A';
+        int e = destination - 'A';
+        for (int i = s; i < e; i++) {
+            if (qty > railwayList.get(i).bookinginfo.size()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void booking(char start, char end, int ticketId, int qty) {
+        int s = start - 'A';
+        int e = end - 'A';
+
+        if (s < 0 || e >= railwayList.size() || s >= e) {
+            System.out.println("Invalid station range");
+            return;
+        }
+
+        if (isAvailable(start, end, qty)) {
+            HashSet<Integer> hs = new HashSet<>();
+            for (int i = s; i < e; i++) {
+                for (int j = 0; j < qty; j++) {
+                    hs.add(railwayList.get(i).bookinginfo.get(j));
+                }
+            }
+            for (int i = s; i < e; i++) {
+                for (int j = 0; j < qty; j++) {
+                    railwayList.get(i).bookinginfo.remove(0);
+                }
+            }
+            Ticket t = new Ticket(ticketId, start, end, "Confirmed", qty);
+            t.seatNo.addAll(hs);
+            tickets.add(t);
+            System.out.println("Successfully booked ticket ID: " + ticketId);
+        } else if (qty <= waitingTicket && waiting.wl.size() >= qty) {
+            ArrayList<Integer> wlSeats = new ArrayList<>();
+            for (int i = 0; i < qty; i++) {
+                wlSeats.add(waiting.wl.remove(0));
+            }
+            Ticket t = new Ticket(ticketId, start, end, "WaitingList", qty);
+            t.seatNo.addAll(wlSeats);
+            tickets.add(t);  // Fix: Add to ticket list
+            System.out.println("Added to WaitingList ticket ID: " + ticketId);
+        } else {
+            System.out.println("No seats available for ticket ID: " + ticketId);
+        }
+    }
+public void cancelTicket(int ticketId, int qty) {
+    Ticket toCancel = null;
+
+    for (Ticket t : tickets) {
+        if (t.ticket_id == ticketId) {
+            toCancel = t;
+            break;
+        }
+    }
+
+    if (toCancel == null) {
+        System.out.println("Ticket ID not found.");
+        return;
+    }
+
+    if (qty > toCancel.seatNo.size()) {
+        System.out.println("Cannot cancel more than booked seats.");
+        return;
+    }
+
+    int s = toCancel.start - 'A';
+    int e = toCancel.destination - 'A';
+
+    List<Integer> seatsToCancel = new ArrayList<>();
+    for (int i = 0; i < qty; i++) {
+        seatsToCancel.add(toCancel.seatNo.remove(0));  // remove qty seats
+    }
+
+    if (toCancel.ticketType.equals("Confirmed")) {
+        for (int i = s; i < e; i++) {
+            railwayList.get(i).bookinginfo.addAll(seatsToCancel);
+            Collections.sort(railwayList.get(i).bookinginfo);
+        }
+        System.out.println("Cancelled " + qty + " confirmed seats from Ticket ID: " + ticketId);
+    } else if (toCancel.ticketType.equals("WaitingList")) {
+        waiting.wl.addAll(seatsToCancel);
+        Collections.sort(waiting.wl);
+        System.out.println(waiting.wl);
+        System.out.println("Cancelled " + qty + " waiting list seats from Ticket ID: " + ticketId);
+    }
+
+    // If all seats are canceled, remove ticket
+    if (toCancel.seatNo.isEmpty()) {
+        tickets.remove(toCancel);
+        System.out.println("Ticket ID: " + ticketId + " is fully canceled.");
+    }
+
+    // Try to promote waiting list tickets
+    List<Ticket> promoted = new ArrayList<>();
+    for (Ticket t : tickets) {
+        if (t.ticketType.equals("WaitingList")) {
+            if (isAvailable(t.start, t.destination, t.ticketQty)) {
+                int st = t.start - 'A';
+                int en = t.destination - 'A';
+                HashSet<Integer> newSeats = new HashSet<>();
+
+                for (int i = st; i < en; i++) {
+                    for (int j = 0; j < t.ticketQty; j++) {
+                        newSeats.add(railwayList.get(i).bookinginfo.get(j));
+                    }
+                }
+
+                for (int i = st; i < en; i++) {
+                    for (int j = 0; j < t.ticketQty; j++) {
+                        railwayList.get(i).bookinginfo.remove(0);
+                    }
+                }
+
+                // Remove from waiting list
+                System.out.println(t.seatNo);
+                for (int sid : t.seatNo) {
+                    waiting.wl.add(sid);
+                    System.out.println(sid);
+                }
+
+                // Update ticket
+                t.ticketType = "Confirmed";
+                t.seatNo.clear();
+                t.seatNo.addAll(newSeats);
+                promoted.add(t);
+            }
+        }
+    }
+
+
+}
+public void chart(){
+    boolean b[][] = new boolean[9][5];
+    for(Ticket t : tickets){
+        
+        int s = t.start - 'A';
+        int e = t.destination - 'A';
+        for(int i = t.seatNo.get(0); i <= t.seatNo.get(t.seatNo.size() -1) ; i++){
+        for(int j =s ; j < e; j++){
+             b[i][j] = true;
+        }
+    }
+        }
+        for(int i =1 ; i < 9; i++){
+            for(int j = 0; j < 5;j++){
+                System.out.print(b[i][j]+" ");
+            }
+            System.out.println();
+        }
+
+}
+
+}
+
+public class Main {
+    static Booking b = new Booking();
+
+    public static void main(String[] args) {
+        b.booking('A', 'E', 1, 8);  // Confirmed booking
+        b.booking('A', 'E', 2, 2);  
+        b.cancelTicket(1,5);
+                for (Ticket t : b.tickets) {
+            System.out.println("Ticket ID: "+ t.ticket_id +"|Start : "+ t.start +" |destination: "+ t.destination + " | Type: " + t.ticketType + " | Seats: " + t.seatNo);
+        }
+        b.chart();
+        
+    }
+}
