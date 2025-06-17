@@ -1,0 +1,102 @@
+import java.util.ArrayList;
+ class Ticket {
+
+    int ticketid;
+    int seatqty;
+    int ticketprice;
+
+    public Ticket(int ticketid, int seatqty, int ticketprice) {
+        this.ticketid = ticketid;
+        this.seatqty = seatqty;
+        this.ticketprice = ticketprice;
+    }
+
+    public String toString() {
+        return String.format("Ticket_id: %3d  Ticket seat no: %3d  Ticket price: %6d", ticketid, seatqty, ticketprice);
+    }
+}
+
+class Flight {
+    int flight_id;
+    int currentflightprice = 5000;
+    ArrayList<Ticket> flightticket = new ArrayList<>();
+    int flightseatreaming = 50;
+    int i = 1;
+
+    public Flight(int flight_id){
+        this.flight_id = flight_id;
+    }
+
+    public String toString(){
+        return String.format("flight_id:%3d flight_current_price:%7d flight_seat_reaming: %3d", flight_id, currentflightprice, flightseatreaming);
+    }
+
+    public void updateprice(int price){
+        currentflightprice += price;
+    }
+
+    public void subprice(int price){
+        currentflightprice -= price;
+    }
+
+    public void updateseatcount(int seatcount){
+        flightseatreaming -= seatcount;
+    }
+
+    public void incresseatcount(int seatcount){
+        flightseatreaming += seatcount;
+    }
+}
+
+
+ class Booking {
+    ArrayList<Flight> flights = new ArrayList<>();
+    static int increase = 200;
+
+    public Booking() {
+        flights.add(new Flight(1));
+    }
+
+    public void bookticket(int seatno, int flightid) {
+        int price = flights.get(flightid - 1).currentflightprice * seatno;
+        flights.get(flightid - 1).updateprice(increase);
+        int ticketid = flights.get(flightid - 1).i;
+        flights.get(flightid - 1).i += 1;
+        Ticket t = new Ticket(ticketid, seatno, price);
+        flights.get(flightid - 1).updateseatcount(seatno);
+        flights.get(flightid - 1).flightticket.add(t);
+        increase += 200;
+    }
+
+    public void cancelticket(int flightid, int ticketid) {
+        int qty = flights.get(flightid - 1).flightticket.get(ticketid - 1).seatqty;
+        flights.get(flightid - 1).incresseatcount(qty);
+        flights.get(flightid - 1).subprice(200);
+        flights.get(flightid - 1).flightticket.remove(ticketid - 1);
+    }
+
+    public void display() {
+        for (Flight f : flights) {
+            System.err.println(f);
+            for (Ticket t : f.flightticket) {
+                System.err.println(t);
+            }
+        }
+    }
+}
+public class Main {
+    static Booking b = new Booking();
+    public static void main(String args[]){
+        b.bookticket(1, 1 );
+        b.bookticket(2, 1 );
+        b.bookticket(1, 1 );
+
+
+        b.display();
+                b.cancelticket(1,2);
+                b.display();
+
+
+    }
+    
+}
